@@ -6,19 +6,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/spf13/cobra"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 )
 
 const (
 	pattern = "[\u4e00-\u9fa5]+"
-	reg =  "[^\u4e00-\u9fa5]"
+	reg     = "[^\u4e00-\u9fa5]"
 )
 
 var (
@@ -30,27 +31,24 @@ var (
 
 func init() {
 	log.SetFlags(0)
-	log.SetPrefix("[FILE-UTIL] ")
+	log.SetPrefix("[FILE-READ] ")
 }
 
 func main() {
 	root := cobra.Command{
-		Use:  "read-file",
+		Use:  "fileread",
 		Long: "read all files from folder",
 	}
 
 	root.PersistentFlags().StringVar(&folder, "folder", "", "need find files from folder")
 	root.PersistentFlags().BoolVar(&export, "export", false, "if export result to json file")
 
-	root.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		return nil
-	}
-
 	root.RunE = func(cmd *cobra.Command, args []string) error {
-		log.Print(color.CyanString("folder: %v", folder))
+		log.Print(color.CyanString("read folder: %v", folder))
 		if len(folder) == 0 {
 			return errors.New("folder is nil Use --help for help")
 		}
+
 		GetFiles(folder)
 		if er := do(); err != nil {
 			return err
@@ -191,4 +189,3 @@ func StringResults(rs *rs) string {
 	}
 	return out.String()
 }
-r
