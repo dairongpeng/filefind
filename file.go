@@ -2,12 +2,25 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/fatih/color"
 	"io"
 	"log"
 	"os"
 	"regexp"
 	"strings"
+)
+
+const (
+	pattern = "[\u4e00-\u9fa5]+"
+	reg     = "[^\u4e00-\u9fa5]"
+)
+
+var (
+	fileNames = make([]string, 0)
+	golds     = make([]*rs, 0)
 )
 
 func readFile(path string) error {
@@ -58,4 +71,27 @@ func readFile(path string) error {
 		golds = append(golds, results)
 	}
 	return nil
+}
+
+type rs struct {
+	Path   string `json:"path"`
+	Values []*V   `json:"values"`
+}
+
+type V struct {
+	Line int    `json:"line"`
+	Val  string `json:"val"`
+}
+
+func StringResults(rs *rs) string {
+	b, err := json.Marshal(rs)
+	if err != nil {
+		return fmt.Sprintf("%+v", rs)
+	}
+	var out bytes.Buffer
+	err = json.Indent(&out, b, "", "    ")
+	if err != nil {
+		return fmt.Sprintf("%+v", rs)
+	}
+	return out.String()
 }
